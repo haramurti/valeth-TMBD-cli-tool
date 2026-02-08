@@ -1,8 +1,3 @@
-Siap, ngerti banget! Maaf ya tadi bikin ribet harus copas satu-satu. 😂
-
-Ini dia **SATU BLOK KODE FULL**. Isinya dari Judul paling atas sampe penutup paling bawah.
-
-Tinggal klik tombol **Copy** di pojok kanan atas, terus tempel (paste) di `README.md` lo. Beres!
 
 ```markdown
 # 🎬 TMDB CLI Tool: Bioskop Mini di Layar Hitam
