@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json" // <--- WAJIB ADA: Buat baca JSON
 	"flag"
 	"fmt"
 	"log"
@@ -10,67 +11,95 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// --- 1. CETAKAN DATA (STRUCTS) ---
+// Taruh ini di luar func main()
+
+type TMDBResponse struct {
+	Results []Movie `json:"results"` // Wadah utama
+}
+
+type Movie struct {
+	Title       string  `json:"title"`
+	Overview    string  `json:"overview"`
+	ReleaseDate string  `json:"release_date"`
+	VoteAverage float64 `json:"vote_average"`
+}
+
 func main() {
-	// 0. LOAD ENV DULUAN (Wajib paling atas)
+	// --- SETUP & REQUEST (Sama kayak Phase 4) ---
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
 	apiKey := os.Getenv("TMDB_API_KEY")
-	if apiKey == "" {
-		log.Fatal("API Key ga ketemu di .env! Isi dulu bang.")
-	}
-
-	// 1. SETUP FLAG
 	movieType := flag.String("type", "popular", "Pilih tipe film: playing, popular, top, upcoming")
 	flag.Parse()
 
-	// 2. VALIDASI & MAPPING (Penerjemah)
 	var endpoint string
-
 	switch *movieType {
 	case "popular":
 		endpoint = "popular"
 	case "upcoming":
 		endpoint = "upcoming"
 	case "playing":
-		endpoint = "now_playing" // Beda istilah
+		endpoint = "now_playing"
 	case "top":
-		endpoint = "top_rated" // Beda istilah
+		endpoint = "top_rated"
 	default:
-		fmt.Println("❌ Error: Tipe film tidak dikenal!")
-		os.Exit(1)
+		log.Fatal("Tipe tidak valid")
 	}
 
-	// 3. BANGUN URL (Merakit Alamat)
-	// Format: https://api.themoviedb.org/3/movie/{endpoint}?api_key={apiKey}
 	baseURL := "https://api.themoviedb.org/3/movie"
 	url := fmt.Sprintf("%s/%s?api_key=%s&language=en-US&page=1", baseURL, endpoint, apiKey)
 
-	fmt.Println("🚀 Menghubungi Server TMDB...")
-	// Debugging: Boleh diprint URL-nya kalau mau ngecek, tapi hati-hati API Key keliatan
-	// fmt.Println("Requesting:", url)
+	fmt.Println("🚀 Mengambil data film...")
 
-	// 4. EKSEKUSI REQUEST (Kurir Berangkat)
 	resp, err := http.Get(url)
-
-	// 5. ERROR HANDLING (Cek Ban Bocor)
 	if err != nil {
-		log.Fatal("Gagal request ke TMDB:", err)
+		log.Fatal(err)
 	}
+	defer resp.Body.Close() // Tutup pintu memori
 
-	// 6. DEFER CLOSE (Tutup Pintu)
-	// Penting: Kode ini baru jalan PAS fungsi main mau selesai.
-	// Tapi WAJIB ditulis tepat abis error checking.
-	defer resp.Body.Close()
-
-	// Cek Status Code (Biar yakin sukses 200 OK)
 	if resp.StatusCode != 200 {
-		log.Fatal("TMDB Marah! Status Code:", resp.StatusCode)
+		log.Fatal("Gagal! Status Code:", resp.StatusCode)
 	}
 
-	fmt.Println("✅ Data berhasil diambil! Status:", resp.Status)
+	// --- 🚀 PHASE 5: UNBOXING & PAMER (BARU) ---
 
-	// Nanti Phase 5 (Decoding) lanjut di sini...
+	// 1. Siapkan Variabel Penampung
+	var record TMDBResponse
+
+	// 2. Decode JSON (Unboxing)
+	// Kita pake Decoder karena lebih hemat memori daripada Unmarshal buat data stream
+	decoder := json.NewDecoder(resp.Body)
+	if err := decoder.Decode(&record); err != nil {
+		log.Fatal("Gagal decode JSON:", err)
+	}
+
+	// 3. Looping & Cantik-in Output
+	fmt.Println("\n🎬 DAFTAR FILM:", *movieType)
+	fmt.Println("========================================")
+
+	for i, movie := range record.Results {
+		// Logika Truncate: Kalau overview kepanjangan, potong biar terminal rapi
+		desc := movie.Overview
+		if len(desc) > 100 {
+			desc = desc[:100] + "..." // Ambil 100 huruf pertama + titik tiga
+		}
+
+		// Ambil Tahun aja (Format asli: YYYY-MM-DD)
+		year := movie.ReleaseDate
+		if len(year) >= 4 {
+			year = year[:4] // Ambil 4 huruf pertama (Tahun)
+		}
+
+		// Print Format Cantik
+		// %d = angka (nomor)
+		// %s = string (teks)
+		// %.1f = float dengan 1 angka di belakang koma
+		fmt.Printf("%d. %s (%s) | ⭐ %.1f\n", i+1, movie.Title, year, movie.VoteAverage)
+		fmt.Printf("   📝 %s\n", desc)
+		fmt.Println("----------------------------------------")
+	}
 }
