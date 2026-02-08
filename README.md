@@ -1,8 +1,4 @@
-Ini dia `README.md` dengan cita rasa **Raditya Dika**: teknisnya dapet, tapi tetap absurd, ringan, dan sedikit curcol. Pas banget buat ditaruh di GitHub biar yang baca senyum-senyum sendiri tapi tetep ngerti cara pakenya.
-
-Langsung *copy-paste* aja ke file `README.md` lo.
-
----
+README.md By Neval Harimurti
 
 ```markdown
 # 🎬 TMDB CLI Tool: Bioskop Mini di Layar Hitam
