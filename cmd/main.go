@@ -42,6 +42,10 @@ func main() {
 
 	baseURL := "https://api.themoviedb.org/3/movie"
 	url := fmt.Sprintf("%s/%s?api_key=%s&language=en-US&page=1", baseURL, endpoint, apiKey)
+	fmt.Println(url)
+	fmt.Println()
+	fmt.Println()
+	fmt.Println()
 
 	fmt.Println("🚀 Mengambil data film...")
 
@@ -73,10 +77,10 @@ func main() {
 
 	for i, movie := range record.Results {
 		// Logika Truncate: Kalau overview kepanjangan, potong biar terminal rapi
-		desc := movie.Overview
-		if len(desc) > 100 {
-			desc = desc[:100] + "..." // Ambil 100 huruf pertama + titik tiga
-		}
+		AdultMovie := movie.Adult
+		// if len(desc) > 100 {
+		// 	desc = desc[:100] + "..." // Ambil 100 huruf pertama + titik tiga
+		// }
 
 		// Ambil Tahun aja (Format asli: YYYY-MM-DD)
 		year := movie.ReleaseDate
@@ -84,12 +88,12 @@ func main() {
 			year = year[:4] // Ambil 4 huruf pertama (Tahun)
 		}
 
-		// Print Format Cantik
+		// Print Format Cantiks
 		// %d = angka (nomor)
 		// %s = string (teks)
 		// %.1f = float dengan 1 angka di belakang koma
 		fmt.Printf("%d. %s (%s) | ⭐ %.1f\n", i+1, movie.Title, year, movie.VoteAverage)
-		fmt.Printf("   📝 %s\n", desc)
+		fmt.Println("adult? :", AdultMovie)
 		fmt.Println("----------------------------------------")
 	}
 }
