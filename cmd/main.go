@@ -1,12 +1,13 @@
 package main
 
 import (
-	"encoding/json" // <--- WAJIB ADA: Buat baca JSON
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"tmdb-cli/internal/domain"
 
 	"github.com/joho/godotenv"
 )
@@ -14,19 +15,8 @@ import (
 // --- 1. CETAKAN DATA (STRUCTS) ---
 // Taruh ini di luar func main()
 
-type TMDBResponse struct {
-	Results []Movie `json:"results"` // Wadah utama
-}
-
-type Movie struct {
-	Title       string  `json:"title"`
-	Overview    string  `json:"overview"`
-	ReleaseDate string  `json:"release_date"`
-	VoteAverage float64 `json:"vote_average"`
-}
-
 func main() {
-	// --- SETUP & REQUEST (Sama kayak Phase 4) ---
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -68,7 +58,7 @@ func main() {
 	// --- 🚀 PHASE 5: UNBOXING & PAMER (BARU) ---
 
 	// 1. Siapkan Variabel Penampung
-	var record TMDBResponse
+	var record domain.TMDBResponse
 
 	// 2. Decode JSON (Unboxing)
 	// Kita pake Decoder karena lebih hemat memori daripada Unmarshal buat data stream

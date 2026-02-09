@@ -1,5 +1,5 @@
 package domain
 
-type TMBDResponse struct {
+type TMDBResponse struct {
 	Results []Movie
 }
