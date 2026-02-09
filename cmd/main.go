@@ -12,15 +12,14 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// --- 1. CETAKAN DATA (STRUCTS) ---
-// Taruh ini di luar func main()
-
 func main() {
 
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
+
+	//change from using using the struct in the same main to the importing from domains.
 
 	apiKey := os.Getenv("TMDB_API_KEY")
 	movieType := flag.String("type", "popular", "Pilih tipe film: playing, popular, top, upcoming")
@@ -53,45 +52,33 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer resp.Body.Close() // Tutup pintu memori
+	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
 		log.Fatal("Gagal! Status Code:", resp.StatusCode)
 	}
 
-	// --- 🚀 PHASE 5: UNBOXING & PAMER (BARU) ---
-
 	// 1. Siapkan Variabel Penampung
 	var record domain.TMDBResponse
 
 	// 2. Decode JSON (Unboxing)
-	// Kita pake Decoder karena lebih hemat memori daripada Unmarshal buat data stream
 	decoder := json.NewDecoder(resp.Body)
 	if err := decoder.Decode(&record); err != nil {
 		log.Fatal("Gagal decode JSON:", err)
 	}
 
-	// 3. Looping & Cantik-in Output
 	fmt.Println("\n🎬 DAFTAR FILM:", *movieType)
 	fmt.Println("========================================")
 
 	for i, movie := range record.Results {
-		// Logika Truncate: Kalau overview kepanjangan, potong biar terminal rapi
+		//Change from parsing from giving description to giving, adult ratings wether its adult movie or not.
 		AdultMovie := movie.Adult
-		// if len(desc) > 100 {
-		// 	desc = desc[:100] + "..." // Ambil 100 huruf pertama + titik tiga
-		// }
 
-		// Ambil Tahun aja (Format asli: YYYY-MM-DD)
 		year := movie.ReleaseDate
 		if len(year) >= 4 {
-			year = year[:4] // Ambil 4 huruf pertama (Tahun)
+			year = year[:4]
 		}
 
-		// Print Format Cantiks
-		// %d = angka (nomor)
-		// %s = string (teks)
-		// %.1f = float dengan 1 angka di belakang koma
 		fmt.Printf("%d. %s (%s) | ⭐ %.1f\n", i+1, movie.Title, year, movie.VoteAverage)
 		fmt.Println("adult? :", AdultMovie)
 		fmt.Println("----------------------------------------")
