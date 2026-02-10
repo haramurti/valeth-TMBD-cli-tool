@@ -108,3 +108,7 @@ Kalau lo nemu *bug* atau mau nambahin fitur (misalnya fitur nyari pacar via sino
 ---
 
 *gua bikin sambil ngantuk jadi maaf kalau error *
+
+project was inspired by roadmap.sh beginner project
+
+https://roadmap.sh/projects/tmdb-cli
